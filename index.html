@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather App</h1>
+    <form id="weatherForm">
+        <input type="text" id="city" placeholder="Enter city name" required>
+        <button type="submit">Get Weather</button>
+    </form>
+    <div class="result" id="result"></div>
+
+    <script>
+        document.getElementById('weatherForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const city = document.getElementById('city').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!city) {
+                resultDiv.textContent = 'Please enter a city name.';
+                return;
+            }
+
+            fetch(`/weather?city=${encodeURIComponent(city)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error fetching weather data.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    resultDiv.innerHTML = `
+                        <p><strong>Location:</strong> ${data.location}, ${data.region}, ${data.country}</p>
+                        <p><strong>Temperature:</strong> ${data.temperature}°C</p>
+                        <p><strong>Condition:</strong> ${data.condition}</p>
+                    `;
+                })
+                .catch(error => {
+                    resultDiv.textContent = error.message;
+                });
+        });
+    </script>
+</body>
+</html>
