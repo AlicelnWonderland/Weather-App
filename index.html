@@ -4,15 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
             text-align: center;
+            background-color: #f0f8ff;
         }
         input, button {
             padding: 10px;
             margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
         }
         .result {
             margin-top: 20px;
@@ -27,6 +46,7 @@
         <button type="submit">Get Weather</button>
     </form>
     <div class="result" id="result"></div>
+    <div id="map"></div>
 
     <script>
         document.getElementById('weatherForm').addEventListener('submit', function(event) {
@@ -34,6 +54,7 @@
 
             const city = document.getElementById('city').value;
             const resultDiv = document.getElementById('result');
+            const mapDiv = document.getElementById('map');
 
             if (!city) {
                 resultDiv.textContent = 'Please enter a city name.';
@@ -41,22 +62,50 @@
             }
 
             fetch(`/weather?city=${encodeURIComponent(city)}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Error fetching weather data.');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    resultDiv.innerHTML = `
-                        <p><strong>Location:</strong> ${data.location}, ${data.region}, ${data.country}</p>
-                        <p><strong>Temperature:</strong> ${data.temperature}°C</p>
-                        <p><strong>Condition:</strong> ${data.condition}</p>
-                    `;
-                })
-                .catch(error => {
-                    resultDiv.textContent = error.message;
-                });
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error fetching data.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const { weather, coordinates, air_quality } = data;
+
+        resultDiv.innerHTML = `
+            <h2>Weather Details</h2>
+            <p><strong>Location:</strong> ${weather.location}, ${weather.region}, ${weather.country}</p>
+            <p><strong>Temperature:</strong> ${weather.temperature}°C (Feels like: ${weather.feels_like}°C)</p>
+            <p><strong>Condition:</strong> ${weather.condition}</p>
+            <img src="https:${weather.icon}" alt="Weather Icon">
+            <p><strong>Humidity:</strong> ${weather.humidity}%</p>
+            <p><strong>Pressure:</strong> ${weather.pressure} mb</p>
+            <p><strong>Wind Speed:</strong> ${weather.wind_speed} kph</p>
+            <p><strong>Rain:</strong> ${weather.rain} mm</p>
+            
+            <h2>Geolocation</h2>
+            <p><strong>Latitude:</strong> ${coordinates.lat}</p>
+            <p><strong>Longitude:</strong> ${coordinates.lng}</p>
+            
+            <h2>Air Quality</h2>
+            <p><strong>City:</strong> ${air_quality.city}, ${air_quality.state}, ${air_quality.country}</p>
+            <p><strong>AQI:</strong> ${air_quality.aqi}</p>
+            <p><strong>Main Pollutant:</strong> ${air_quality.main_pollutant}</p>
+        `;
+
+        mapDiv.innerHTML = '';
+        const map = L.map('map').setView([coordinates.lat, coordinates.lng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        L.marker([coordinates.lat, coordinates.lng])
+            .addTo(map)
+            .bindPopup(`<b>${weather.location}</b><br>${weather.region}, ${weather.country}`)
+            .openPopup();
+    })
+    .catch(error => {
+        resultDiv.textContent = error.message;
+    });
+
         });
     </script>
 </body>
