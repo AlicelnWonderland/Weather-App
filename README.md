@@ -1,3 +1,5 @@
+**Group: SE-2303**
+**Yerniyaz Balgabev**
 This Node.js application retrieves weather data, geolocation coordinates, and air quality information based on the city provided through an API. It uses three main APIs:
 ![alt text](https://github.com/AlicelnWonderland/Weather-App/blob/main/Pic1.jpg?raw=true)
 WeatherAPI for current weather information.
