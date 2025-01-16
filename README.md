@@ -1,9 +1,9 @@
 This Node.js application retrieves weather data, geolocation coordinates, and air quality information based on the city provided through an API. It uses three main APIs:
-
+![alt text](https://github.com/AlicelnWonderland/Weather-App/blob/main/Pic1.jpg?raw=true)
 WeatherAPI for current weather information.
 OpenCage for geocoding (getting coordinates from a city name).
 IQAir for air quality data.
-
+![alt text](https://github.com/AlicelnWonderland/Weather-App/blob/main/Pic2.jpg?raw=true)
 API keys:
 
 WEATHER_API_KEY for accessing WeatherAPI.
